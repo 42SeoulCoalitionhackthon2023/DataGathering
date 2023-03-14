@@ -14,7 +14,6 @@ def get_data(token)
   loop do
     response = token.get("/v2/cursus_users?filter[campus_id]=29&page[number]=#{x}").parsed
     break if response.empty?
-		break if x ==3
     data << response
     x += 1
     sleep 0.1
