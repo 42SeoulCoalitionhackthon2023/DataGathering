@@ -42,6 +42,7 @@ def print_data(data)
     puts element.fetch("level")
     puts element.fetch("blackholed_at")
     puts element.dig("user", "id")
+    puts element.dig("user", "login")
     puts element.dig("user", "image", "versions", "small")
     puts "\n"
   end
