@@ -46,8 +46,6 @@ total = result.length
 correction_id, comment, feedback, final_mark, flag_outstanding, corrector, corrected, created_at, project_id, project_name = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
 # 초기화 완료
 for index in 0..total-1
-  # puts result[index].fetch("id")
-  # puts result[index]
   check_qurey = db_client.prepare("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END AS `exists` FROM feedback WHERE correction_id = #{result[index].fetch("id")}")
   if (result[index].fetch("id").nil?) || (check_qurey.execute().first['exists'] != 0)
     next
@@ -56,14 +54,12 @@ for index in 0..total-1
   end
   unless result[index].fetch("comment").nil?
     comment = result[index].fetch("comment")
-    # comment = comment_str.encode('ASCII', 'UTF-8', invalid: :replace, undef: :replace, replace: '')
   end
   unless result[index].fetch("created_at").nil?
     created_at = DateTime.iso8601(result[index].fetch("created_at")).strftime('%Y-%m-%d %H:%M:%S')
   end
   unless result[index].fetch("feedback").nil?
     feedback = result[index].fetch("feedback")
-    # feedback = feedback_str.encode('ASCII', 'UTF-8', invalid: :replace, undef: :replace, replace: '')
   end
   if result[index].fetch("final_mark").nil?
     next
@@ -88,9 +84,6 @@ for index in 0..total-1
   unless result[index]["team"]["project_gitlab_path"].split("/").last.nil?
     project_name = result[index]["team"]["project_gitlab_path"].split("/").last
   end
-  # puts correction_id, comment, feedback, final_mark, flag_outstanding, corrector, corrected, created_at, project_id, project_name
-  # puts "#{index} \n\n"
-  # puts feedback_str, comment_str
   statement = db_client.prepare("INSERT INTO feedback(correction_id, comment, feedback, final_mark, flag_outstanding, corrector, corrected, created_at, project_id, project_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
   statement.execute(correction_id, comment.gsub(/\p{Emoji}/, ''), feedback.gsub(/\p{Emoji}/, ''), final_mark, flag_outstanding, corrector, corrected, created_at, project_id, project_name)
 end
