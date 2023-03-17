@@ -11,14 +11,14 @@ token = api_client.client_credentials.get_token
 # 데이터 가져오는 로직
 def get_data(token)
   data = []
-  x = 79
+  x = 0
   loop do
     response = token.get("/v2/cursus_users?filter[campus_id]=29&page[size]=100&page[number]=#{x}").parsed
     break if response.empty?
     data << response
     x += 1
     sleep 0.1
-    puts x
+    # puts x
   rescue => e
     puts "Error occurred: #{e.message}"
     puts "Retrying in 5 seconds..."
@@ -84,12 +84,13 @@ def put_database(data)
     unless element.dig("user", "image", "versions", "small").nil?
       image = element.dig("user", "image", "versions", "small")
     end
-
     existing_user = db_client.query("SELECT * FROM user WHERE user_id = #{user_id}").first
     if existing_user
-      update_statement = db_client.prepare("UPDATE user SET intra_id = ?, image = ?, blackhole = ?, level = ? WHERE user_id = ?")
-      update_statement.execute(intra_id, image, blackhole, level, user_id)
+      # puts "update"
+      update_statement = db_client.prepare("UPDATE user SET intra_id = ?, image = ?, blackhole = ? WHERE user_id = ?")
+      update_statement.execute(intra_id, image, blackhole, user_id)
     else
+      # puts "insert"
       statement = db_client.prepare("INSERT INTO user(user_id, intra_id, image, blackhole, level) VALUES (?, ?, ?, ?, ?)")
       statement.execute(user_id, intra_id, image, blackhole, level)
     end
