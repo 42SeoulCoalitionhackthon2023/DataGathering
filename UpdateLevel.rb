@@ -16,10 +16,15 @@ def get_user_id(db_client)
 end
 
 def update_user_level(user_id, db_client)
-  # Get the average final mark for the user's corrector
 	user_id = user_id.to_s
   result = db_client.query("SELECT AVG(final_mark) AS avg_marks FROM feedback WHERE corrector = #{user_id[1..-2]}")
 	avg_final_mark = result.first["avg_marks"].to_i
+	if(avg_final_mark > 100)
+		avg_final_mark = 100
+	end
+	if(avg_final_mark < 20)
+		avg_final_mark = 0
+	end
 	db_client.query("UPDATE user SET level = #{avg_final_mark} WHERE user_id = #{user_id[1..-2]}")
 end
 
@@ -28,4 +33,3 @@ total = ids.length
 for index in 0..total - 1
 	update_user_level(ids[index], db_client)
 end
-# update_user_level(["68927"], db_client)
